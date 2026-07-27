@@ -47,9 +47,9 @@ def arguments() -> argparse.Namespace:
     )
     parser.add_argument("--subtype", type=int, choices=(0, 1), default=1,
                         help="0=main stream, 1=lower-resolution substream")
-    parser.add_argument("--model", default="yolo11n.pt",
+    parser.add_argument("--model", default="yolo11x.pt",
                         help="Ultralytics model file; downloaded once if absent")
-    parser.add_argument("--confidence", type=float, default=0.25)
+    parser.add_argument("--confidence", type=float, default=0.45)
     parser.add_argument("--min-area", type=float, default=0.025,
                         help="Minimum dog box area as fraction of the image")
     parser.add_argument("--window-seconds", type=float, default=3.0)
@@ -141,7 +141,7 @@ def main() -> int:
 
                 elif class_id == PERSON_CLASS:
                     saw_person = True
-                    label, color = f"CAT-LIKE candidate {confidence:.2f}", (0, 200, 255)
+                    label, color = f"PERSON-LIKE candidate {confidence:.2f}", (0, 200, 255)
 
                 cv2.rectangle(frame, (x1, y1), (x2, y2), color, 2)
                 cv2.putText(frame, label, (x1, max(25, y1 - 8)),

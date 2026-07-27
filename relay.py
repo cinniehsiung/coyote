@@ -1,6 +1,7 @@
 import subprocess
 
 BOARD_ID = "6QMBS"  # ID printed by `sudo usbrelay`
+CHANNEL_LIGHTS = 1
 
 
 class RelayBoard:
@@ -29,7 +30,7 @@ class RelayBoard:
             )
 
     def lights_on(self):
-        self.set_relay(1, True)
+        self.set_relay(CHANNEL_LIGHTS, True)
 
     def lights_off(self):
-        self.set_relay(1, False)
+        self.set_relay(CHANNEL_LIGHTS, False)
