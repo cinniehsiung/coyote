@@ -118,6 +118,8 @@ def main() -> int:
             now = time.monotonic()
             saw_large_dog = False
             saw_small_dog = False
+            saw_cat = False
+            saw_person = False
 
             for box in result.boxes:
                 class_id = int(box.cls[0])
@@ -133,22 +135,34 @@ def main() -> int:
                         saw_small_dog = True
                         label, color = f"small DOG-LIKE {confidence:.2f}", (0, 200, 255)
 
-                # cv2.rectangle(frame, (x1, y1), (x2, y2), color, 2)
-                # cv2.putText(frame, label, (x1, max(25, y1 - 8)),
-                #             cv2.FONT_HERSHEY_SIMPLEX, 0.6, color, 2)
+                elif class_id == CAT_CLASS:
+                    saw_cat = True
+                    label, color = f"CAT-LIKE candidate {confidence:.2f}", (0, 200, 255)
 
-            if saw_large_dog or saw_small_dog:
-                # cv2.putText(frame, "POSSIBLE COYOTE - TEST ONLY", (25, 50),
-                #             cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 0, 255), 3)
-                # if now - last_event >= args.cooldown:
-                    # timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-                    # filename = snapshot_dir / f"possible_coyote_{timestamp}.jpg"
-                    # cv2.imwrite(str(filename), frame)
-                print(f"[{datetime.now(timezone.utc):%F %T}] POSSIBLE COYOTE;")
+                elif class_id == PERSON_CLASS:
+                    saw_person = True
+                    label, color = f"CAT-LIKE candidate {confidence:.2f}", (0, 200, 255)
+
+                cv2.rectangle(frame, (x1, y1), (x2, y2), color, 2)
+                cv2.putText(frame, label, (x1, max(25, y1 - 8)),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.6, color, 2)
+
+            if saw_large_dog:
+                cv2.putText(frame, "COYOTE_DETECTED", (25, 50),
+                            cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 0, 255), 3)
+                timestamp = datetime.now(timezone.utc).strftime("%Y-%m-%d_%H-%M-%S")
+                filename = snapshot_dir / f"coyote_{timestamp}.jpg"
+                cv2.imwrite(str(filename), frame)
+                print(f"[{datetime.now(timezone.utc):%F %T}] COYOTE DETECTED;")
                 last_event = now
                 relay.lights_on()
 
-            elif now - last_event >= args.cooldown:
+            if saw_small_dog or saw_cat or saw_person:
+                timestamp = datetime.now(timezone.utc).strftime("%Y-%m-%d_%H-%M-%S")
+                filename = snapshot_dir / f"not_coyote_{timestamp}.jpg"
+                cv2.imwrite(str(filename), frame)
+
+            if now - last_event >= args.cooldown:
                relay.lights_off()
 
             if not args.no_window:
