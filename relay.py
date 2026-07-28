@@ -1,7 +1,7 @@
 import subprocess
 
 BOARD_ID = "6QMBS"  # ID printed by `sudo usbrelay`
-CHANNEL_LIGHTS = 1
+CHANNEL_LIGHTS = 4
 
 
 class RelayBoard:
