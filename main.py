@@ -21,9 +21,10 @@ import argparse
 import os
 import sys
 import time
-from datetime import datetime, timezone
+from datetime import datetime
 from pathlib import Path
 from urllib.parse import quote
+from zoneinfo import ZoneInfo
 
 import cv2
 from ultralytics import YOLO
@@ -34,6 +35,7 @@ from relay import BOARD_ID, RelayBoard
 CAT_CLASS = 15  # COCO class IDs used by standard Ultralytics models
 DOG_CLASS = 16
 PERSON_CLASS = 0
+SAN_FRANCISCO_TZ = ZoneInfo("America/Los_Angeles")
 
 
 def arguments() -> argparse.Namespace:
@@ -150,15 +152,17 @@ def main() -> int:
             if saw_large_dog:
                 cv2.putText(frame, "COYOTE_DETECTED", (25, 50),
                             cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 0, 255), 3)
-                timestamp = datetime.now(timezone.utc).strftime("%Y-%m-%d_%H-%M-%S")
+                event_time = datetime.now(SAN_FRANCISCO_TZ)
+                timestamp = event_time.strftime("%Y-%m-%d_%H-%M-%S")
                 filename = snapshot_dir / f"coyote_{timestamp}.jpg"
                 cv2.imwrite(str(filename), frame)
-                print(f"[{datetime.now(timezone.utc):%F %T}] COYOTE DETECTED;")
+                print(f"[{event_time:%F %T %Z}] COYOTE DETECTED;")
                 last_event = now
                 relay.lights_on()
 
             if saw_small_dog or saw_cat or saw_person:
-                timestamp = datetime.now(timezone.utc).strftime("%Y-%m-%d_%H-%M-%S")
+                event_time = datetime.now(SAN_FRANCISCO_TZ)
+                timestamp = event_time.strftime("%Y-%m-%d_%H-%M-%S")
                 filename = snapshot_dir / f"not_coyote_{timestamp}.jpg"
                 cv2.imwrite(str(filename), frame)
 
