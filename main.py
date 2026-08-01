@@ -59,6 +59,8 @@ def arguments() -> argparse.Namespace:
     parser.add_argument("--snapshots", default="events")
     parser.add_argument("--no-window", action="store_true",
                         help="Run without displaying a video window")
+    parser.add_argument("--debug", action="store_true",
+                        help="Run with the coyote detector firing for humans")
     return parser.parse_args()
 
 
@@ -149,7 +151,7 @@ def main() -> int:
                 cv2.putText(frame, label, (x1, max(25, y1 - 8)),
                             cv2.FONT_HERSHEY_SIMPLEX, 0.6, color, 2)
 
-            if saw_large_dog:
+            if saw_large_dog or (args.debug and saw_person):
                 cv2.putText(frame, "COYOTE_DETECTED", (25, 50),
                             cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 0, 255), 3)
                 event_time = datetime.now(SAN_FRANCISCO_TZ)
@@ -158,7 +160,7 @@ def main() -> int:
                 cv2.imwrite(str(filename), frame)
                 print(f"[{event_time:%F %T %Z}] COYOTE DETECTED;")
                 last_event = now
-                relay.lights_on()
+                relay.all_on()
 
             if saw_small_dog or saw_cat or saw_person:
                 event_time = datetime.now(SAN_FRANCISCO_TZ)
@@ -167,7 +169,7 @@ def main() -> int:
                 cv2.imwrite(str(filename), frame)
 
             if now - last_event >= args.cooldown:
-               relay.lights_off()
+               relay.all_off()
 
             if not args.no_window:
                 cv2.imshow("Coyote detector - q to quit", frame)
@@ -176,7 +178,7 @@ def main() -> int:
     except KeyboardInterrupt:
         print("\nStopped.")
     finally:
-        relay.lights_off()
+        relay.all_off()
         camera.close()
         cv2.destroyAllWindows()
 

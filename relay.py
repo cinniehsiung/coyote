@@ -2,6 +2,7 @@ import subprocess
 
 BOARD_ID = "6QMBS"  # ID printed by `sudo usbrelay`
 CHANNEL_LIGHTS = 4
+CHANNEL_SPRINKLERS = 3
 
 
 class RelayBoard:
@@ -34,3 +35,17 @@ class RelayBoard:
 
     def lights_off(self):
         self.set_relay(CHANNEL_LIGHTS, False)
+
+    def sprinklers_on(self):
+        self.set_relay(CHANNEL_SPRINKLERS, True)
+
+    def sprinklers_off(self):
+        self.set_relay(CHANNEL_SPRINKLERS, False)
+
+    def all_on(self):
+        self.lights_on()
+        self.sprinklers_on()
+
+    def all_off(self):
+        self.lights_off()
+        self.sprinklers_off()
