@@ -38,7 +38,7 @@ PERSON_CLASS = 0
 
 def arguments() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Detect animals in an EmpireTech RTSP stream")
-    parser.add_argument("--camera-ip", default="192.168.4.108")
+    parser.add_argument("--camera-ip", default="192.168.1.108")
     parser.add_argument("--username", default="admin")
     parser.add_argument(
         "--password",
