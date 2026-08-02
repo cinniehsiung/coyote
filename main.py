@@ -26,6 +26,7 @@ from pathlib import Path
 from urllib.parse import quote
 from zoneinfo import ZoneInfo
 
+os.environ["OPENCV_FFMPEG_CAPTURE_OPTIONS"] = "rtsp_transport;tcp"
 import cv2
 from ultralytics import YOLO
 
@@ -168,7 +169,7 @@ def main() -> int:
             if saw_large_dog or (args.debug and saw_person):
                 last_event = now
                 if not relay.is_all_on:
-                    cv2.putText(frame, "COYOTE_DETECTED", (25, 50), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 0, 255), 3)
+                    cv2.putText(frame, f"COYOTE DETECTED {" DEBUG MODE" if args.debug else ""}", (25, 50), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 0, 255), 3)
                     timestamp = event_time.strftime("%Y-%m-%d_%H-%M-%S")
                     filename = snapshot_dir / f"{timestamp}_coyote.jpg"
                     cv2.imwrite(str(filename), frame)
