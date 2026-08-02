@@ -162,7 +162,7 @@ def main() -> int:
                 last_event = now
                 relay.all_on()
 
-            if saw_small_dog or saw_cat or saw_person:
+            if saw_small_dog or saw_cat:
                 event_time = datetime.now(SAN_FRANCISCO_TZ)
                 timestamp = event_time.strftime("%Y-%m-%d_%H-%M-%S")
                 filename = snapshot_dir / f"not_coyote_{timestamp}.jpg"
