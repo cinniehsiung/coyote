@@ -37,10 +37,11 @@ DOG_CLASS = 16
 PERSON_CLASS = 0
 SAN_FRANCISCO_TZ = ZoneInfo("America/Los_Angeles")
 
+CAMERA_IP_1 = "192.168.1.108"
+
 
 def arguments() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Detect animals in an EmpireTech RTSP stream")
-    parser.add_argument("--camera-ip", default="192.168.1.108")
     parser.add_argument("--username", default="admin")
     parser.add_argument(
         "--password",
@@ -85,14 +86,14 @@ def main() -> int:
 
     print(f"Loading {args.model} ...")
     model = YOLO(args.model)
-    url = rtsp_url(args.camera_ip, args.username, args.password, args.subtype)
+    url = rtsp_url(CAMERA_IP_1, args.username, args.password, args.subtype)
     # Force RTSP over TCP before camera.py opens the stream.
     os.environ.setdefault("OPENCV_FFMPEG_CAPTURE_OPTIONS", "rtsp_transport;tcp")
     try:
         camera = Camera(url)
     except RuntimeError as exc:
         print(str(exc), file=sys.stderr)
-        print(f"Check camera IP, password and RTSP settings for {args.camera_ip}.", file=sys.stderr)
+        print(f"Check camera IP, password and RTSP settings for {CAMERA_IP_1}.", file=sys.stderr)
         return 1
 
     last_event = 0.0
