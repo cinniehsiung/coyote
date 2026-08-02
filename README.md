@@ -1,5 +1,12 @@
 # Coyote Defense System Notes
 
+The startup procedure is as follows:
+```
+ssh coyote
+coyote_setup
+python3 main.py
+```
+
 ## Camera Notes
 ip addr: 192.168.1.108
 ip addr: 192.168.1.109
