@@ -2,11 +2,22 @@
 
 ## Camera Notes
 ip addr: 192.168.1.108
+ip addr: 192.168.1.109
 username: admin
 pw: CAMERA_PASSWORD
 
+Forward IP through remote:
+```
+ssh -N -L 8080:192.168.1.108:80 coyote
+```
+
+Then access through:
+```
+http://localhost:8080
+```
+
 // To make the thing work, need to add it.
-sudo ip addr add 192.168.4.10/24 dev eno1
+sudo ip addr add 192.168.1.10/24 dev eno1
 
 ## USB Relay Notes
 ```

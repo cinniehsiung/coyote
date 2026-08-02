@@ -37,7 +37,8 @@ DOG_CLASS = 16
 PERSON_CLASS = 0
 SAN_FRANCISCO_TZ = ZoneInfo("America/Los_Angeles")
 
-CAMERA_IP_1 = "192.168.1.108"
+CAMERA_IP_1 = "192.168.1.109"
+CAMERA_IP_2 = "192.168.1.108"
 
 
 def arguments() -> argparse.Namespace:
