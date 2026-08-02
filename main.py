@@ -121,6 +121,9 @@ def main() -> int:
             )[0]
 
             now = time.monotonic()
+
+
+
             saw_large_dog = False
             saw_small_dog = False
             saw_cat = False
@@ -152,25 +155,27 @@ def main() -> int:
                 cv2.putText(frame, label, (x1, max(25, y1 - 8)),
                             cv2.FONT_HERSHEY_SIMPLEX, 0.6, color, 2)
 
-            if saw_large_dog or (args.debug and saw_person):
-                cv2.putText(frame, "COYOTE_DETECTED", (25, 50),
-                            cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 0, 255), 3)
-                event_time = datetime.now(SAN_FRANCISCO_TZ)
-                timestamp = event_time.strftime("%Y-%m-%d_%H-%M-%S")
-                filename = snapshot_dir / f"coyote_{timestamp}.jpg"
-                cv2.imwrite(str(filename), frame)
-                print(f"[{event_time:%F %T %Z}] COYOTE DETECTED;")
-                last_event = now
-                relay.all_on()
+            enough_time_delay = now - last_event >= args.cooldown
+            event_time = datetime.now(SAN_FRANCISCO_TZ)
 
-            if saw_small_dog or saw_cat:
-                event_time = datetime.now(SAN_FRANCISCO_TZ)
+            if saw_large_dog or (args.debug and saw_person):
+                last_event = now
+                if not relay.is_all_on:
+                    cv2.putText(frame, "COYOTE_DETECTED", (25, 50), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 0, 255), 3)
+                    timestamp = event_time.strftime("%Y-%m-%d_%H-%M-%S")
+                    filename = snapshot_dir / f"coyote_{timestamp}.jpg"
+                    cv2.imwrite(str(filename), frame)
+                    print(f"[{event_time:%F %T %Z}] {"COYOTE" if saw_large_dog else "PERSON"} DETECTED;")
+                    relay.all_on()
+
+            elif args.debug and (saw_small_dog or saw_cat):
                 timestamp = event_time.strftime("%Y-%m-%d_%H-%M-%S")
                 filename = snapshot_dir / f"not_coyote_{timestamp}.jpg"
                 cv2.imwrite(str(filename), frame)
 
-            if now - last_event >= args.cooldown:
-               relay.all_off()
+            elif enough_time_delay and relay.is_all_on:
+                print(f"[{event_time:%F %T %Z}] ALL CLEAR;")
+                relay.all_off()
 
             if not args.no_window:
                 cv2.imshow("Coyote detector - q to quit", frame)

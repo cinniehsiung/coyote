@@ -1,7 +1,7 @@
 # Coyote Defense System Notes
 
 ## Camera Notes
-ip addr: 192.168.4.108
+ip addr: 192.168.1.108
 username: admin
 pw: CAMERA_PASSWORD
 

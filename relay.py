@@ -9,6 +9,7 @@ class RelayBoard:
     def __init__(self, board_id, debug=False):
         self.board_id = board_id
         self.debug = debug
+        self.is_all_on = False
 
     def set_relay(self, channel, on):
         state = 1 if on else 0
@@ -45,7 +46,9 @@ class RelayBoard:
     def all_on(self):
         self.lights_on()
         self.sprinklers_on()
+        self.is_all_on = True
 
     def all_off(self):
         self.lights_off()
         self.sprinklers_off()
+        self.is_all_on = False
