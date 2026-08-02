@@ -30,13 +30,18 @@ import cv2
 from ultralytics import YOLO
 
 from camera import Camera
+from dog_bark import DogBarkPlayer
 from relay import BOARD_ID, RelayBoard
 
+# Model identification classes
 CAT_CLASS = 15  # COCO class IDs used by standard Ultralytics models
 DOG_CLASS = 16
 PERSON_CLASS = 0
+
+# Time zone info
 SAN_FRANCISCO_TZ = ZoneInfo("America/Los_Angeles")
 
+# Camera IP addresses
 CAMERA_IP_1 = "192.168.1.109"
 CAMERA_IP_2 = "192.168.1.108"
 
@@ -101,6 +106,7 @@ def main() -> int:
 
     # Setup deterants
     relay = RelayBoard(BOARD_ID, debug=False)
+    dog_bark_player = DogBarkPlayer(sound_file="/home/coyoteaiedge1-0/coyote/sounds/dog_bark.mp3")
     print("Detector running. Press q in the video window to stop.")
 
     try:
@@ -122,8 +128,6 @@ def main() -> int:
             )[0]
 
             now = time.monotonic()
-
-
 
             saw_large_dog = False
             saw_small_dog = False
@@ -164,19 +168,23 @@ def main() -> int:
                 if not relay.is_all_on:
                     cv2.putText(frame, "COYOTE_DETECTED", (25, 50), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 0, 255), 3)
                     timestamp = event_time.strftime("%Y-%m-%d_%H-%M-%S")
-                    filename = snapshot_dir / f"coyote_{timestamp}.jpg"
+                    filename = snapshot_dir / f"{timestamp}_coyote.jpg"
                     cv2.imwrite(str(filename), frame)
                     print(f"[{event_time:%F %T %Z}] {"COYOTE" if saw_large_dog else "PERSON"} DETECTED;")
                     relay.all_on()
+                    dog_bark_player.play(repeat=100)
 
-            elif args.debug and (saw_small_dog or saw_cat):
+            elif args.debug and enough_time_delay and (saw_small_dog or saw_cat):
+                last_event = now
                 timestamp = event_time.strftime("%Y-%m-%d_%H-%M-%S")
-                filename = snapshot_dir / f"not_coyote_{timestamp}.jpg"
+                filename = snapshot_dir / f"{timestamp}_not_coyote.jpg"
                 cv2.imwrite(str(filename), frame)
 
             elif enough_time_delay and relay.is_all_on:
                 print(f"[{event_time:%F %T %Z}] ALL CLEAR;")
                 relay.all_off()
+                dog_bark_player.stop()
+
 
             if not args.no_window:
                 cv2.imshow("Coyote detector - q to quit", frame)

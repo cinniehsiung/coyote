@@ -34,10 +34,12 @@ class Camera:
 
     def latest(self):
         with self._lock:
-            if self._frame is None:
-                return None
+            frame = self._frame
 
-            return self._frame.copy()
+        if frame is None:
+            return None
+
+        return frame.copy()
 
     def close(self) -> None:
         self._running = False
