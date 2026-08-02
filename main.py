@@ -64,10 +64,9 @@ def arguments() -> argparse.Namespace:
     parser.add_argument("--confidence", type=float, default=0.45)
     parser.add_argument("--min-area", type=float, default=0.025,
                         help="Minimum dog box area as fraction of the image")
-    parser.add_argument("--window-seconds", type=float, default=3.0)
     parser.add_argument("--cooldown", type=float, default=2.0)
     parser.add_argument("--snapshots", default="events")
-    parser.add_argument("--no-window", action="store_true",
+    parser.add_argument("--window", action="store_true",
                         help="Run without displaying a video window")
     parser.add_argument("--debug", action="store_true",
                         help="Run with the coyote detector firing for humans")
@@ -146,18 +145,18 @@ def main() -> int:
                 if class_id == DOG_CLASS:
                     if area_fraction >= args.min_area:
                         saw_large_dog = True
-                        label, color = f"DOG-LIKE candidate {confidence:.2f}", (0, 0, 255)
+                        label, color = f"LARGE DOG {confidence:.2f}", (0, 0, 255)
                     else:
                         saw_small_dog = True
-                        label, color = f"small DOG-LIKE {confidence:.2f}", (0, 200, 255)
+                        label, color = f"SMALL DOG {confidence:.2f}", (0, 200, 255)
 
                 elif class_id == CAT_CLASS:
                     saw_cat = True
-                    label, color = f"CAT-LIKE candidate {confidence:.2f}", (0, 200, 255)
+                    label, color = f"CAT {confidence:.2f}", (0, 200, 255)
 
                 elif class_id == PERSON_CLASS:
                     saw_person = True
-                    label, color = f"PERSON-LIKE candidate {confidence:.2f}", (0, 200, 255)
+                    label, color = f"PERSON {confidence:.2f}", (0, 200, 255)
 
                 cv2.rectangle(frame, (x1, y1), (x2, y2), color, 2)
                 cv2.putText(frame, label, (x1, max(25, y1 - 8)),
@@ -177,7 +176,7 @@ def main() -> int:
                     relay.all_on()
                     speaker.play(repeat=100)
 
-            elif args.debug and enough_time_delay and (saw_small_dog or saw_cat):
+            elif enough_time_delay and (saw_small_dog or saw_cat):
                 last_event = now
                 timestamp = event_time.strftime("%Y-%m-%d_%H-%M-%S")
                 filename = snapshot_dir / f"{timestamp}_not_coyote.jpg"
@@ -189,7 +188,7 @@ def main() -> int:
                 speaker.stop()
 
 
-            if not args.no_window:
+            if args.window:
                 cv2.imshow("Coyote detector - q to quit", frame)
                 if cv2.waitKey(1) & 0xFF == ord("q"):
                     break

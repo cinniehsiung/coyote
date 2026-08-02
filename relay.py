@@ -16,6 +16,7 @@ class RelayBoard:
 
         cmd = [
             "sudo",
+            "-n",
             "usbrelay",
             f"{self.board_id}_{channel}={state}"
         ]
