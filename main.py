@@ -30,8 +30,8 @@ import cv2
 from ultralytics import YOLO
 
 from camera import Camera
-from dog_bark import DogBarkPlayer
 from relay import BOARD_ID, RelayBoard
+from speaker import Speaker
 
 # Model identification classes
 CAT_CLASS = 15  # COCO class IDs used by standard Ultralytics models
@@ -44,6 +44,9 @@ SAN_FRANCISCO_TZ = ZoneInfo("America/Los_Angeles")
 # Camera IP addresses
 CAMERA_IP_1 = "192.168.1.109"
 CAMERA_IP_2 = "192.168.1.108"
+
+# Sound deterrants
+bark_file = Path(__file__).resolve().parent / "sounds" / "dog_bark.wav"
 
 
 def arguments() -> argparse.Namespace:
@@ -106,7 +109,7 @@ def main() -> int:
 
     # Setup deterants
     relay = RelayBoard(BOARD_ID, debug=False)
-    dog_bark_player = DogBarkPlayer(sound_file="/home/coyoteaiedge1-0/coyote/sounds/dog_bark.mp3")
+    speaker = Speaker(sound_file=bark_file)
     print("Detector running. Press q in the video window to stop.")
 
     try:
@@ -172,7 +175,7 @@ def main() -> int:
                     cv2.imwrite(str(filename), frame)
                     print(f"[{event_time:%F %T %Z}] {"COYOTE" if saw_large_dog else "PERSON"} DETECTED;")
                     relay.all_on()
-                    dog_bark_player.play(repeat=100)
+                    speaker.play(repeat=100)
 
             elif args.debug and enough_time_delay and (saw_small_dog or saw_cat):
                 last_event = now
@@ -183,7 +186,7 @@ def main() -> int:
             elif enough_time_delay and relay.is_all_on:
                 print(f"[{event_time:%F %T %Z}] ALL CLEAR;")
                 relay.all_off()
-                dog_bark_player.stop()
+                speaker.stop()
 
 
             if not args.no_window:
