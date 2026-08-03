@@ -53,3 +53,48 @@ there are apparently also the 8 variations, need to test it
 
 ## Linux Desktop Settings
 sudo cpupower frequency-set -g performance
+
+```
+# Contents of /etc/systemd/system/coyote.service
+
+[Unit]
+Description=Coyote AI Detection and Deterrent
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=simple
+
+User=coyoteaiedge1-0
+Group=coyoteaiedge1-0
+
+WorkingDirectory=/home/coyoteaiedge1-0/coyote
+
+ExecStartPre=-/usr/sbin/ip addr add 192.168.1.10/24 dev eno1
+
+EnvironmentFile=/etc/coyote.env
+Environment=PYTHONUNBUFFERED=1
+Environment=HOME=/home/coyoteaiedge1-0
+
+# Connect to the user's existing PipeWire/PulseAudio session.
+Environment=XDG_RUNTIME_DIR=/run/user/1000
+Environment=DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/1000/bus
+Environment=PULSE_SERVER=unix:/run/user/1000/pulse/native
+
+ExecStart=/home/coyoteaiedge1-0/coyote/.venv/bin/python -u /home/coyoteaiedge1-0/coyote/main.py
+
+Restart=on-failure
+RestartSec=5
+
+KillSignal=SIGINT
+TimeoutStopSec=20
+
+[Install]
+WantedBy=multi-user.target
+```
+
+```
+# Contents of /etc/coyote.env
+
+CAMERA_PASSWORD=PUT_YOUR_REAL_CAMERA_PASSWORD_HERE
+```
