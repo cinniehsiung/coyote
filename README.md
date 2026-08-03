@@ -7,6 +7,18 @@ coyote_setup
 python3 main.py
 ```
 
+For the systemc route:
+```
+# To start the service:
+sudo systemctl start coyote.service
+# To restart the service after changing code:
+sudo systemctl restart coyote.service
+# To get recent logs:
+sudo journalctl -u coyote.service -n 80 --no-pager
+# To inspect the process:
+sudo systemctl status coyote.service --no-pager
+```
+
 ## Camera Notes
 ip addr: 192.168.1.108
 ip addr: 192.168.1.109
@@ -38,3 +50,6 @@ yolo11n -- chatgpt started with this but apparently it is the most shitty for lo
 yolo11x -- apparently the most accurate but largest as well
 
 there are apparently also the 8 variations, need to test it
+
+## Linux Desktop Settings
+sudo cpupower frequency-set -g performance
