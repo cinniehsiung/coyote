@@ -38,6 +38,7 @@ from speaker import Speaker
 CAT_CLASS = 15  # COCO class IDs used by standard Ultralytics models
 DOG_CLASS = 16
 PERSON_CLASS = 0
+NOTHING = -1
 
 # Time zone info
 SAN_FRANCISCO_TZ = ZoneInfo("America/Los_Angeles")
@@ -106,6 +107,7 @@ def main() -> int:
         return 1
 
     last_event = 0.0
+    last_detection = -1
 
     # Setup deterants
     relay = RelayBoard(BOARD_ID, debug=False)
@@ -168,6 +170,7 @@ def main() -> int:
 
             if saw_large_dog or (args.debug and saw_person):
                 last_event = now
+                last_detection = DOG_CLASS
                 if not relay.is_all_on:
                     cv2.putText(frame, f"COYOTE DETECTED {" DEBUG MODE" if args.debug else ""}", (25, 50), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 0, 255), 3)
                     timestamp = event_time.strftime("%Y-%m-%d_%H-%M-%S")
@@ -182,11 +185,21 @@ def main() -> int:
                 timestamp = event_time.strftime("%Y-%m-%d_%H-%M-%S")
                 filename = snapshot_dir / f"{timestamp}_not_coyote.jpg"
                 cv2.imwrite(str(filename), frame)
+                if last_detection != CAT_CLASS:
+                    print(f" CAT/SMALL DOG DETECTED at {timestamp}")
+                last_detection = CAT_CLASS
+
+
+            elif saw_person and last_detection != PERSON_CLASS:
+                timestamp = event_time.strftime("%Y-%m-%d_%H-%M-%S")
+                print(f"PERSON DETECTED at {timestamp}")
+                last_detection = PERSON_CLASS
 
             elif enough_time_delay and relay.is_all_on:
                 print(f"[{event_time:%F %T %Z}] ALL CLEAR;")
                 relay.all_off()
                 speaker.stop()
+                last_detection = NOTHING
 
 
             if args.window:
