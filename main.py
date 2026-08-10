@@ -19,6 +19,7 @@ from __future__ import annotations
 
 import argparse
 import os
+import signal
 import sys
 import time
 from datetime import datetime
@@ -623,9 +624,22 @@ def run_deterrants(
 # ======================================================================
 # MAIN
 # ======================================================================
+paused = False
+
+
+def toggle_pause(signum, frame):
+    global paused
+    paused = not paused
+
+    if paused:
+        print("PAUSE requested")
+    else:
+        print("RESUME requested")
+
 
 def main() -> int:
-
+    global paused
+    signal.signal(signal.SIGUSR1, toggle_pause)
     args = arguments()
 
     if not args.password:
@@ -738,6 +752,13 @@ def main() -> int:
     try:
 
         while True:
+            if paused:
+                if relay.is_all_on:
+                    relay.all_off()
+                    speaker.stop()
+
+                time.sleep(0.1)
+                continue
 
             # ==========================================================
             # STEP 1
