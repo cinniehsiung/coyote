@@ -68,12 +68,12 @@ class RelayBoard:
 
         try:
             self.lights_off()
-        except Exception as exc:
+        except RuntimeError as exc:
             errors.append(f"lights: {exc}")
 
         try:
             self.sprinklers_off()
-        except Exception as exc:
+        except RuntimeError as exc:
             errors.append(f"sprinklers: {exc}")
 
         self.is_all_on = False
