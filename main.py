@@ -486,8 +486,9 @@ def run_deterrants(
                     snapshot_dir
                     / (
                         f"{timestamp}_"
-                        f"{camera_name}_"
-                        f"coyote.jpg"
+                        f"coyote_"
+                        f"{camera_name}.jpg"
+
                     )
                 )
 
