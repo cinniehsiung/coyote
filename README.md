@@ -17,6 +17,8 @@ sudo systemctl restart coyote.service
 sudo journalctl -u coyote.service -n 80 --no-pager
 # To inspect the process:
 sudo systemctl status coyote.service --no-pager
+# To stream the logs from the process:
+ sudo journalctl -u coyote.service -f
 # To pause/unpause the process:
 sudo systemctl kill --kill-whom=main --signal=SIGUSR1 coyote.service
 ```
